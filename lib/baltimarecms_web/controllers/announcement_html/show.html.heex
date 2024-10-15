@@ -1,0 +1,17 @@
+<.header>
+  Announcement <%= @announcement.id %>
+  <:subtitle>This is a announcement record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/announcements/#{@announcement}/edit"}>
+      <.button>Edit announcement</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title"><%= @announcement.title %></:item>
+  <:item title="Content"><%= @announcement.content %></:item>
+  <:item title="Announcer"><%= @announcement.announcer %></:item>
+</.list>
+
+<.back navigate={~p"/announcements"}>Back to announcements</.back>

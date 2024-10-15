@@ -1,0 +1,8 @@
+<.header>
+  Edit Announcement <%= @announcement.id %>
+  <:subtitle>Use this form to manage announcement records in your database.</:subtitle>
+</.header>
+
+<.announcement_form changeset={@changeset} action={~p"/announcements/#{@announcement}"} />
+
+<.back navigate={~p"/announcements"}>Back to announcements</.back>
