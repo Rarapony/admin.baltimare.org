@@ -3,6 +3,7 @@ defmodule BaltimarecmsWeb.AnnouncementController do
 
   alias Baltimarecms.Announcements
   alias Baltimarecms.Announcements.Announcement
+  alias Baltimarecms.JWT
 
   def index(conn, _params) do
     announcements = Announcements.list_announcements()
@@ -15,13 +16,31 @@ defmodule BaltimarecmsWeb.AnnouncementController do
   end
 
   def create(conn, %{"announcement" => announcement_params}) do
-    case Announcements.create_announcement(announcement_params) do
-      {:ok, announcement} ->
-        conn
-        |> put_flash(:info, "Announcement created successfully.")
-        |> redirect(to: ~p"/announcements/#{announcement}")
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+    displayName = case conn.req_cookies["token"] do
+      nil ->
+        # Handle missing token (e.g., return an error or redirect)
+        conn
+        |> put_status(:unauthorized)
+        |> json(%{error: "Missing token"})
+
+      token ->
+        case JWT.verify_token(token) do
+          {:ok, decoded} -> decoded["displayName"] # Get displayName from claims
+          {:error, _reason} -> nil # Handle invalid token (e.g., return an error)
+        end
+    end
+
+    updated_announcement_params =
+      Map.put(announcement_params, "announcer", displayName)
+
+      case Announcements.create_announcement(updated_announcement_params) do
+        {:ok, announcement} ->
+          conn
+          |> put_flash(:info, "Announcement created successfully.")
+          |> redirect(to: ~p"/announcements/#{announcement}")
+
+          {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, :new, changeset: changeset)
     end
   end
@@ -40,7 +59,30 @@ defmodule BaltimarecmsWeb.AnnouncementController do
   def update(conn, %{"id" => id, "announcement" => announcement_params}) do
     announcement = Announcements.get_announcement!(id)
 
-    case Announcements.update_announcement(announcement, announcement_params) do
+    displayName = case conn.req_cookies["token"] do
+        nil ->
+          # Handle missing token (you might want to redirect to login)
+          conn
+          |> put_status(:unauthorized)
+          |> json(%{error: "Missing token"})
+
+        token ->
+          case JWT.verify_token(token) do
+            {:ok, decoded} -> decoded["displayName"] # Get displayName from claims
+            {:error, _reason} ->
+              # Handle invalid token (e.g., return an error or redirect)
+              conn
+              |> put_status(:unauthorized)
+              |> json(%{error: "Invalid token"})
+          end
+      end
+
+    # 2. Update announcement_params with displayName
+    updated_announcement_params =
+      Map.put(announcement_params, "announcer", displayName)
+
+
+    case Announcements.update_announcement(announcement, updated_announcement_params) do
       {:ok, announcement} ->
         conn
         |> put_flash(:info, "Announcement updated successfully.")
