@@ -3,10 +3,8 @@ defmodule Baltimarecms.JWT do
 
   # Function to verify the JWT
   def verify_token(token) do
-    secret = Application.get_env(:baltimarecms, :jwt_secret) ||
-            System.get_env("JWT_SECRET") # Fallback if not in config
-
-    # signer = Joken.Signer.create("HS256", "Horsecock")
+    secret = Application.get_env(:baltimarecms, :jwt_secret)
+    signer = Joken.Signer.create("HS256", secret || "Horsecock")
 
     case Joken.verify(token, signer) do
       {:ok, claims} -> {:ok, claims}
