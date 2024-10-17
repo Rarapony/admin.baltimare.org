@@ -35,3 +35,5 @@ baltimarecms-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore run.sh
+run.sh
