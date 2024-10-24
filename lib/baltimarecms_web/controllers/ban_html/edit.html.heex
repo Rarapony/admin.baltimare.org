@@ -1,0 +1,8 @@
+<.header>
+  Edit Ban <%= @ban.id %>
+  <:subtitle>Use this form to manage ban records in your database.</:subtitle>
+</.header>
+
+<.ban_form changeset={@changeset} action={~p"/bans/#{@ban}"} />
+
+<.back navigate={~p"/bans"}>Back to bans</.back>

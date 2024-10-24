@@ -1,9 +1,10 @@
 defmodule BaltimarecmsWeb.PageController do
   use BaltimarecmsWeb, :controller
+  alias Baltimarecms.Auth
 
   def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    render(conn, :home, layout: false)
+    displayName = Auth.get_display_name(conn) # Use the function
+
+    render(conn, :home, displayName: displayName)
   end
 end

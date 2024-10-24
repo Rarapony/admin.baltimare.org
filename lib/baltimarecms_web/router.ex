@@ -19,6 +19,7 @@ defmodule BaltimarecmsWeb.Router do
 
     get "/", PageController, :home
 
+    resources "/bans", BanController
     resources "/announcements", AnnouncementController
   end
 

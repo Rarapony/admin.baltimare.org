@@ -3,7 +3,7 @@ defmodule BaltimarecmsWeb.AnnouncementController do
 
   alias Baltimarecms.Announcements
   alias Baltimarecms.Announcements.Announcement
-  alias Baltimarecms.JWT
+  alias Baltimarecms.Auth
 
   def index(conn, _params) do
     announcements = Announcements.list_announcements()
@@ -17,19 +17,7 @@ defmodule BaltimarecmsWeb.AnnouncementController do
 
   def create(conn, %{"announcement" => announcement_params}) do
 
-    displayName = case conn.req_cookies["token"] do
-      nil ->
-        # Handle missing token (e.g., return an error or redirect)
-        conn
-        |> put_status(:unauthorized)
-        |> json(%{error: "Missing token"})
-
-      token ->
-        case JWT.verify_token(token) do
-          {:ok, decoded} -> decoded["displayName"] # Get displayName from claims
-          {:error, _reason} -> nil # Handle invalid token (e.g., return an error)
-        end
-    end
+    displayName = Auth.get_display_name(conn)
 
     updated_announcement_params =
       Map.put(announcement_params, "announcer", displayName)
@@ -59,23 +47,7 @@ defmodule BaltimarecmsWeb.AnnouncementController do
   def update(conn, %{"id" => id, "announcement" => announcement_params}) do
     announcement = Announcements.get_announcement!(id)
 
-    displayName = case conn.req_cookies["token"] do
-        nil ->
-          # Handle missing token (you might want to redirect to login)
-          conn
-          |> put_status(:unauthorized)
-          |> json(%{error: "Missing token"})
-
-        token ->
-          case JWT.verify_token(token) do
-            {:ok, decoded} -> decoded["displayName"] # Get displayName from claims
-            {:error, _reason} ->
-              # Handle invalid token (e.g., return an error or redirect)
-              conn
-              |> put_status(:unauthorized)
-              |> json(%{error: "Invalid token"})
-          end
-      end
+    displayName = Auth.get_display_name(conn)
 
     # 2. Update announcement_params with displayName
     updated_announcement_params =

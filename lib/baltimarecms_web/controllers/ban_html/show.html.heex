@@ -1,0 +1,21 @@
+<.header>
+  Ban <%= @ban.id %>
+  <:subtitle>This is a ban record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/bans/#{@ban}/edit"}>
+      <.button>Edit ban</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Uuid"><%= @ban.uuid %></:item>
+  <:item title="Janny"><%= @ban.janny %></:item>
+  <:item title="Until"><%= @ban.until %></:item>
+  <:item title="Time"><%= @ban.time %></:item>
+  <:item title="Rule"><%= @ban.rule %></:item>
+  <:item title="Reason"><%= @ban.reason %></:item>
+  <:item title="Active"><%= @ban.active %></:item>
+</.list>
+
+<.back navigate={~p"/bans"}>Back to bans</.back>
