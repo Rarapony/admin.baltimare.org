@@ -3,6 +3,8 @@ defmodule BaltimarecmsWeb.BanController do
 
   alias Baltimarecms.Bans
   alias Baltimarecms.Bans.Ban
+  alias Baltimarecms.DateUtils
+  alias Baltimarecms.Auth
 
   def index(conn, _params) do
     bans = Bans.list_bans()
@@ -15,14 +17,29 @@ defmodule BaltimarecmsWeb.BanController do
   end
 
   def create(conn, %{"ban" => ban_params}) do
-    case Bans.create_ban(ban_params) do
-      {:ok, ban} ->
-        conn
-        |> put_flash(:info, "Ban created successfully.")
-        |> redirect(to: ~p"/bans/#{ban}")
+    case DateUtils.date_string_to_unix(ban_params["until"]) do
+      unix_timestamp when is_integer(unix_timestamp) ->
+        updated_ban_params =
+          %{ban_params | "until" => unix_timestamp}
+          |> Map.put("time", DateUtils.current_time_unix())
+          |> Map.put("janny", Auth.get_display_name(conn))
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :new, changeset: changeset)
+        IO.inspect(updated_ban_params)
+
+        case Bans.create_ban(updated_ban_params) do
+          {:ok, ban} ->
+            conn
+            |> put_flash(:info, "Ban created successfully.")
+            |> redirect(to: ~p"/bans/#{ban}")
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, :new, changeset: changeset)
+        end
+
+      {:error, :invalid_date_format} ->
+        conn
+        |> put_flash(:error, "Invalid date format. Please use YYYY-MM-DD.")
+        |> render(:new, changeset: Bans.change_ban(%Ban{}))
     end
   end
 

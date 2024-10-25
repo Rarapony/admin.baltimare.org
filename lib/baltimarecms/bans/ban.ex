@@ -3,7 +3,7 @@ defmodule Baltimarecms.Bans.Ban do
   import Ecto.Changeset
 
   schema "bans" do
-    field :active, :boolean, default: false
+    field :active, :boolean, default: true
     field :reason, :string
     field :time, :integer
     field :until, :integer
