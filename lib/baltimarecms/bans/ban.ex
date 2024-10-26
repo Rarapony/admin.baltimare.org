@@ -18,6 +18,6 @@ defmodule Baltimarecms.Bans.Ban do
   def changeset(ban, attrs) do
     ban
     |> cast(attrs, [:uuid, :janny, :until, :time, :rule, :reason, :active])
-    |> validate_required([:uuid, :janny, :until, :time, :rule, :reason, :active])
+    |> validate_required([:uuid, :janny, :time, :rule, :reason, :active])
   end
 end
