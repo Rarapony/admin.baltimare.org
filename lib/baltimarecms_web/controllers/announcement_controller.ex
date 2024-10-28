@@ -17,10 +17,10 @@ defmodule BaltimarecmsWeb.AnnouncementController do
 
   def create(conn, %{"announcement" => announcement_params}) do
 
-    displayName = Auth.get_display_name(conn)
+    user = Auth.get_user(conn)
 
     updated_announcement_params =
-      Map.put(announcement_params, "announcer", displayName)
+      Map.put(announcement_params, "announcer", user.display_name)
 
       case Announcements.create_announcement(updated_announcement_params) do
         {:ok, announcement} ->
@@ -47,12 +47,10 @@ defmodule BaltimarecmsWeb.AnnouncementController do
   def update(conn, %{"id" => id, "announcement" => announcement_params}) do
     announcement = Announcements.get_announcement!(id)
 
-    displayName = Auth.get_display_name(conn)
+    user = Auth.get_user(conn)
 
-    # 2. Update announcement_params with displayName
     updated_announcement_params =
-      Map.put(announcement_params, "announcer", displayName)
-
+      Map.put(announcement_params, "announcer", user.display_name)
 
     case Announcements.update_announcement(announcement, updated_announcement_params) do
       {:ok, announcement} ->

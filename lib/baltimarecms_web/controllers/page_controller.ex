@@ -3,8 +3,8 @@ defmodule BaltimarecmsWeb.PageController do
   alias Baltimarecms.Auth
 
   def home(conn, _params) do
-    displayName = Auth.get_display_name(conn) # Use the function
+    user = Auth.get_user(conn)
 
-    render(conn, :home, displayName: displayName)
+    render(conn, :home, displayName: user.display_name)
   end
 end
