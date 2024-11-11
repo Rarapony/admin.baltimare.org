@@ -5,6 +5,6 @@ defmodule BaltimarecmsWeb.PageController do
   def home(conn, _params) do
     user = Auth.get_user(conn)
 
-    render(conn, :home, displayName: user.display_name)
+    render(conn, :home, displayName: "user.display_name")
   end
 end
