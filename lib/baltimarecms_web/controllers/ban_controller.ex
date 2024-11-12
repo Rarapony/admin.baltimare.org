@@ -4,7 +4,6 @@ defmodule BaltimarecmsWeb.BanController do
   alias Baltimarecms.Bans
   alias Baltimarecms.Bans.Ban
   alias Baltimarecms.DateUtils
-  alias Baltimarecms.Auth
 
   def index(conn, _params) do
     bans = Bans.list_bans()
@@ -17,11 +16,11 @@ defmodule BaltimarecmsWeb.BanController do
   end
 
   def create(conn, %{"ban" => ban_params}) do
-    user = Auth.get_user(conn)
+    user = conn.assigns.current_user
 
     updated_ban_params =
       Map.put(ban_params, "time", DateUtils.current_time_unix())
-      |> Map.put("janny", user.display_name)
+      |> Map.put("janny", user.username)
       # |> Map.put("until", 0)
 
     IO.inspect(updated_ban_params)
@@ -50,11 +49,11 @@ defmodule BaltimarecmsWeb.BanController do
 
   def update(conn, %{"id" => id, "ban" => ban_params}) do
     ban = Bans.get_ban!(id)
-    user = Auth.get_user(conn)
+    user = conn.assigns.current_user
 
     updated_ban_params =
       Map.put(ban_params, "time", DateUtils.current_time_unix())
-      |> Map.put("janny", user.display_name)
+      |> Map.put("janny", user.username)
       |> Map.put("until", 0)
 
     case Bans.update_ban(ban, updated_ban_params) do

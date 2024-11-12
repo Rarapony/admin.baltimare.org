@@ -1,10 +1,9 @@
 defmodule BaltimarecmsWeb.PageController do
   use BaltimarecmsWeb, :controller
-  alias Baltimarecms.Auth
 
   def home(conn, _params) do
-    user = Auth.get_user(conn)
+    current_user = conn.assigns.current_user
 
-    render(conn, :home, displayName: "user.display_name")
+    render(conn, :home, display_name: current_user)
   end
 end

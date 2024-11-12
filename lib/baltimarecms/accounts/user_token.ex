@@ -8,7 +8,7 @@ defmodule Baltimarecms.Accounts.UserToken do
 
   # It is very important to keep the reset password token expiry short,
   # since someone with access to the email may take over the account.
-  @reset_password_validity_in_days 1
+  @token_validity_in_days 1
   @confirm_validity_in_days 7
   @change_email_validity_in_days 7
   @session_validity_in_days 60
@@ -78,7 +78,7 @@ defmodule Baltimarecms.Accounts.UserToken do
   for example, by phone numbers.
   """
   def build_email_token(user, context) do
-    build_hashed_token(user, context, user.email)
+    build_hashed_token(user, context, user.uuid)
   end
 
   defp build_hashed_token(user, context, sent_to) do
@@ -116,7 +116,7 @@ defmodule Baltimarecms.Accounts.UserToken do
         query =
           from token in by_token_and_context_query(hashed_token, context),
             join: user in assoc(token, :user),
-            where: token.inserted_at > ago(^days, "day") and token.sent_to == user.email,
+            where: token.inserted_at > ago(^days, "day") and token.sent_to == user.uuid,
             select: user
 
         {:ok, query}
@@ -126,8 +126,8 @@ defmodule Baltimarecms.Accounts.UserToken do
     end
   end
 
+  defp days_for_context("magic_link"), do: @token_validity_in_days
   defp days_for_context("confirm"), do: @confirm_validity_in_days
-  defp days_for_context("reset_password"), do: @reset_password_validity_in_days
 
   @doc """
   Checks if the token is valid and returns its underlying lookup query.

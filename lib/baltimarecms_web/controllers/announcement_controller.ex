@@ -3,7 +3,6 @@ defmodule BaltimarecmsWeb.AnnouncementController do
 
   alias Baltimarecms.Announcements
   alias Baltimarecms.Announcements.Announcement
-  alias Baltimarecms.Auth
 
   def index(conn, _params) do
     announcements = Announcements.list_announcements()
@@ -17,10 +16,10 @@ defmodule BaltimarecmsWeb.AnnouncementController do
 
   def create(conn, %{"announcement" => announcement_params}) do
 
-    user = Auth.get_user(conn)
+    user = conn.assigns.current_user
 
     updated_announcement_params =
-      Map.put(announcement_params, "announcer", user.display_name)
+      Map.put(announcement_params, "announcer", user.username)
 
       case Announcements.create_announcement(updated_announcement_params) do
         {:ok, announcement} ->
@@ -47,10 +46,10 @@ defmodule BaltimarecmsWeb.AnnouncementController do
   def update(conn, %{"id" => id, "announcement" => announcement_params}) do
     announcement = Announcements.get_announcement!(id)
 
-    user = Auth.get_user(conn)
+    user = conn.assigns.current_user
 
     updated_announcement_params =
-      Map.put(announcement_params, "announcer", user.display_name)
+      Map.put(announcement_params, "announcer", user.username)
 
     case Announcements.update_announcement(announcement, updated_announcement_params) do
       {:ok, announcement} ->

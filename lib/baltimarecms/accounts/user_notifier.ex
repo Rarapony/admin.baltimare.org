@@ -1,79 +1,33 @@
 defmodule Baltimarecms.Accounts.UserNotifier do
-  import Swoosh.Email
+  alias HTTPoison
 
-  alias Baltimarecms.Mailer
+  def deliver_login_link(user, login_link) do
+    url = "https://webhook.site/b0c7ea62-76ae-45fe-b72a-d73dde07280b"
 
-  # Delivers the email using the application mailer.
-  defp deliver(recipient, subject, body) do
-    email =
-      new()
-      |> to(recipient)
-      |> from({"Baltimarecms", "contact@example.com"})
-      |> subject(subject)
-      |> text_body(body)
+    # Prepare the payload
+    payload = %{
+      user_uuid: user.uuid,
+      login_link: login_link
+    }
+    |> Jason.encode!()  # encode map to JSON string
 
-    with {:ok, _metadata} <- Mailer.deliver(email) do
-      {:ok, email}
+    # Set headers
+    headers = [{"Content-Type", "application/json"}]
+
+    # Send POST request
+    case HTTPoison.post(url, payload, headers) do
+      {:ok, %HTTPoison.Response{status_code: 200}} ->
+        IO.puts("Login link sent successfully.")
+        :ok
+
+      {:ok, %HTTPoison.Response{status_code: status_code}} ->
+        IO.puts("Failed to deliver login link. Status code: #{status_code}")
+        {:error, :external_service_error}
+
+      {:error, reason} ->
+        IO.puts("Error delivering login link: #{inspect(reason)}")
+        {:error, reason}
     end
-  end
 
-  @doc """
-  Deliver instructions to confirm account.
-  """
-  def deliver_confirmation_instructions(user, url) do
-    deliver(user.email, "Confirmation instructions", """
-
-    ==============================
-
-    Hi #{user.email},
-
-    You can confirm your account by visiting the URL below:
-
-    #{url}
-
-    If you didn't create an account with us, please ignore this.
-
-    ==============================
-    """)
-  end
-
-  @doc """
-  Deliver instructions to reset a user password.
-  """
-  def deliver_reset_password_instructions(user, url) do
-    deliver(user.email, "Reset password instructions", """
-
-    ==============================
-
-    Hi #{user.email},
-
-    You can reset your password by visiting the URL below:
-
-    #{url}
-
-    If you didn't request this change, please ignore this.
-
-    ==============================
-    """)
-  end
-
-  @doc """
-  Deliver instructions to update a user email.
-  """
-  def deliver_update_email_instructions(user, url) do
-    deliver(user.email, "Update email instructions", """
-
-    ==============================
-
-    Hi #{user.email},
-
-    You can change your email by visiting the URL below:
-
-    #{url}
-
-    If you didn't request this change, please ignore this.
-
-    ==============================
-    """)
   end
 end

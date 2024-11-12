@@ -6,7 +6,7 @@
     </h1>
 
     <p class="mt-4 text-lg text-gray-500">
-      Greetings, <%= @displayName || "Janny(?)" %> 
+      Greetings, <%= (@display_name && @display_name.username) || "Guest" %>
     </p>
     
   </div>

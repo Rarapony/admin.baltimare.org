@@ -25,7 +25,7 @@ defmodule BaltimarecmsWeb.UserAuth do
   disconnected on log out. The line can be safely removed
   if you are not using LiveView.
   """
-  def log_in_user(conn, user, params \\ %{}) do
+  def login_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
     user_return_to = get_session(conn, :user_return_to)
 
@@ -60,8 +60,6 @@ defmodule BaltimarecmsWeb.UserAuth do
   #     end
   #
   defp renew_session(conn) do
-    delete_csrf_token()
-
     conn
     |> configure_session(renew: true)
     |> clear_session()
@@ -132,16 +130,16 @@ defmodule BaltimarecmsWeb.UserAuth do
   Use the `on_mount` lifecycle macro in LiveViews to mount or authenticate
   the current_user:
 
-      defmodule BaltimarecmsWeb.PageLive do
-        use BaltimarecmsWeb, :live_view
+      defmodule ExampleWeb.PageLive do
+        use ExampleWeb, :live_view
 
-        on_mount {BaltimarecmsWeb.UserAuth, :mount_current_user}
+        on_mount {ExampleWeb.UserAuth, :mount_current_user}
         ...
       end
 
   Or use the `live_session` of your router to invoke the on_mount callback:
 
-      live_session :authenticated, on_mount: [{BaltimarecmsWeb.UserAuth, :ensure_authenticated}] do
+      live_session :authenticated, on_mount: [{ExampleWeb.UserAuth, :ensure_authenticated}] do
         live "/profile", ProfileLive, :index
       end
   """
@@ -158,7 +156,7 @@ defmodule BaltimarecmsWeb.UserAuth do
       socket =
         socket
         |> Phoenix.LiveView.put_flash(:error, "You must log in to access this page.")
-        |> Phoenix.LiveView.redirect(to: ~p"/users/log_in")
+        |> Phoenix.LiveView.redirect(to: ~p"/login")
 
       {:halt, socket}
     end
@@ -208,7 +206,7 @@ defmodule BaltimarecmsWeb.UserAuth do
       conn
       |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
-      |> redirect(to: ~p"/users/log_in")
+      |> redirect(to: ~p"/login")
       |> halt()
     end
   end
