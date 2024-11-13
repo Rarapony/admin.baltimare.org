@@ -2,7 +2,7 @@ defmodule Baltimarecms.Accounts.UserNotifier do
   alias HTTPoison
 
   def deliver_login_link(user, login_link) do
-    url = "https://webhook.site/b0c7ea62-76ae-45fe-b72a-d73dde07280b"
+    url = "https://api.baltimare.org/corrade/account/login"
 
     # Prepare the payload
     payload = %{
