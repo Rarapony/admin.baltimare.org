@@ -9,6 +9,7 @@
 
 <.table id="bans" rows={@bans} row_click={&JS.navigate(~p"/bans/#{&1}")}>
   <:col :let={ban} label="Uuid"><%= ban.uuid %></:col>
+  <:col :let={ban} label="User"><%= ban.user.username || "Unknown" %></:col>
   <:col :let={ban} label="Janny"><%= ban.janny %></:col>
   <%!-- <:col :let={ban} label="Until"><%= ban.until %></:col>
   <:col :let={ban} label="Time"><%= ban.time %></:col> --%>

@@ -17,8 +17,10 @@ defmodule Baltimarecms.Bans do
       [%Ban{}, ...]
 
   """
+  # In Bans.list_bans/0
   def list_bans do
-    Repo.all(Ban)
+    # Assuming you have a user association in your Ban schema
+    Repo.all(from b in Ban, preload: [:user])
   end
 
   @doc """

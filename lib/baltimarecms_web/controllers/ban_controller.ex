@@ -4,6 +4,7 @@ defmodule BaltimarecmsWeb.BanController do
   alias Baltimarecms.Bans
   alias Baltimarecms.Bans.Ban
   alias Baltimarecms.DateUtils
+  alias Baltimarecms.Accounts
 
   def index(conn, _params) do
     bans = Bans.list_bans()
@@ -38,7 +39,15 @@ defmodule BaltimarecmsWeb.BanController do
 
   def show(conn, %{"id" => id}) do
     ban = Bans.get_ban!(id)
-    render(conn, :show, ban: ban)
+
+    username =
+      case Accounts.get_user_by_uuid(ban.uuid) do
+        # or handle the case where the user is not found differently
+        nil -> "Unknown User"
+        user -> user.username
+      end
+
+    render(conn, :show, ban: ban, username: username)
   end
 
   def edit(conn, %{"id" => id}) do
